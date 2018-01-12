@@ -139,7 +139,7 @@ router.post('/', (req, res) => {
 
                     var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`));
 
-                    stream.on('end', () => {
+                    stream.on('close', () => {
                         for (var x in incomingRoutes.destinations) {
                             var destination = incomingRoutes.destinations[x];
                             queue.push({pageid, destination});
