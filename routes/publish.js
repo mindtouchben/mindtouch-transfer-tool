@@ -39,6 +39,7 @@ var upload_file = (params, callback) => {
             fs.createReadStream(__dirname + `/tmp/${pageid}.mtarc`).pipe(request.put(options, (error, response) => {
                 console.log(response.body);
                 console.log(params.destination);
+                console.log('Finished uplaod' + pageid);
                 callback();
             }))
         } else {
@@ -140,6 +141,7 @@ router.post('/', (req, res) => {
                     var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`));
                     
                     stream.on('finish', () => {
+                        console.log('Download finished' + pageid);
                         for (var x in incomingRoutes.destinations) {
                             var destination = incomingRoutes.destinations[x];
                             queue.push({pageid, destination});
