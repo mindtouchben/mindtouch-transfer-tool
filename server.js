@@ -9,7 +9,7 @@ var app = express();
 
 app.use(bodyParser.json());
 
-app.use(express.static('./routes/files'));
+app.use('/files', express.static('routes/tmp'));
 
 app.use(function (req, res, next) {
 
