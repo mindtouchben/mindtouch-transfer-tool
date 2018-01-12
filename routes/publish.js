@@ -54,6 +54,7 @@ var upload_file = (params, callback) => {
                 if (response.statusCode != 200) {
                     console.log('Failed upload to' + url.origin);
                     console.log(body);
+                    console.log(params)
                     setTimeout(() => {
                         upload_file(params, callback);
                     }, 10000)
