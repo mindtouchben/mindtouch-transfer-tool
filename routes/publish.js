@@ -137,9 +137,13 @@ router.post('/', (req, res) => {
                         }
                     }
 
-                    var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`));
+                    var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`)).on('response', (response) => {
+                        console.log(response);
+                        console.log('response: finished download');
+                    });
 
                     stream.on('close', () => {
+                        console.log('close: finished download');
                         for (var x in incomingRoutes.destinations) {
                             var destination = incomingRoutes.destinations[x];
                             queue.push({pageid, destination});
