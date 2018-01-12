@@ -148,7 +148,7 @@ router.post('/', (req, res) => {
                     },
                     json: true
                 }
-                
+
 
                 request.get(options, (err, response) => {
                     
@@ -164,7 +164,7 @@ router.post('/', (req, res) => {
                     var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`));
 
                     stream.on('close', () => {
-                        console.log('close: finished download');
+                        console.log('uploading now');
                         for (var x in incomingRoutes.destinations) {
                             var destination = incomingRoutes.destinations[x];
                             queue.push({pageid, destination});
