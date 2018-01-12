@@ -1,0 +1,8 @@
+{
+  "sourceUrl": "https://benr-demo.mindtouch.us/Import",
+  "sourcePath": "/Cold/General/Cleaning_the_refrigerator%2C_freezer%2C_refrigerator_-_freezer",
+  "destinations": [
+    "https://benr-demo.mindtouch.us/Import_Test/Cooling/Air_conditioner",
+    "https://benr-demo.mindtouch.us/Import_Test/Cooling/Refrigerator%2C_freezer_and_refrigerator%2F%2Ffreezer"
+  ]
+}
