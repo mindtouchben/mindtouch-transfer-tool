@@ -5,6 +5,7 @@ const fs = require('fs');
 var URL = require('url-parse');
 var _ = require('lodash');
 var async = require('async');
+var FormData = require('form-data');
 
 var router = express.Router();
 
@@ -26,21 +27,43 @@ var upload_file = (params, callback) => {
 
     request.get(options, (error, response) => {
         if (!error) {
-            var parentid = response.body['@id'];            
+            var parentid = response.body['@id'];       
+            
+            var formData = new FormData();
+            formData.append('my_file', fs.createReadStream(__dirname + `/tmp/${pageid}.mtarc`));
+            
             options = {
+                method: 'PUT',
+                preambleCRLF: true,
+                postambleCRLF: true,
                 url: `${url.origin}/@api/deki/pages/${parentid}/import?dream.out.format=json&filename=${pageid}.mtarc&behavior=async`,
                 auth: {
                     user: 'mtimport',
                     pass: '1234Mind'
                 },
-                json: true
+                json: true,
+                multipart: [
+                    {
+                        'content-type': 'application/json',
+                        body: fs.readFileSync(__dirname + `/tmp/${pageid}.mtarc`)
+                    }
+                ]
             }
 
-            fs.createReadStream(__dirname + `/tmp/${pageid}.mtarc`).pipe(request.put(options, (error, response) => {
-                console.log(response.body);
-                console.log(params.destination);
-                callback();
-            }))
+            request.put(options, (err, res, body) => {
+                if (response.statusCode != 200) {
+                    console.log('Failed');
+                    setTimeout(() => {
+                        upload_file(params, callback);
+                    }, 10000)
+                } else {
+                    console.log('Complete');
+                    console.log(response.statusCode);
+                    console.log(params.destination);
+                    callback();
+                }
+            })
+
         } else {
             // log error
             console.log(error);
@@ -136,11 +159,8 @@ router.post('/', (req, res) => {
                             pass: '1234Mind'
                         }
                     }
-
-                    var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`)).on('response', (response) => {
-                        console.log(response);
-                        console.log('response: finished download');
-                    });
+                    
+                    var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`));
 
                     stream.on('close', () => {
                         console.log('close: finished download');
