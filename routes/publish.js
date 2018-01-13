@@ -26,7 +26,7 @@ var upload_file = (params, callback) => {
     }
 
     request.get(options, (error, response) => {
-        if (!error) {
+        if (!error && response.body['@id'] != undefined) {
             var parentid = response.body['@id'];       
             
             var formData = new FormData();
@@ -69,6 +69,7 @@ var upload_file = (params, callback) => {
         } else {
             // log error
             console.log(error);
+            console.log(options, response.body);
         }
     });
 }
