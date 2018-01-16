@@ -29,9 +29,6 @@ var upload_file = (params, callback) => {
         if (!error && response.body['@id'] != undefined) {
             var parentid = response.body['@id'];       
             
-            var formData = new FormData();
-            formData.append('my_file', fs.createReadStream(__dirname + `/tmp/${pageid}.mtarc`));
-            
             options = {
                 method: 'PUT',
                 preambleCRLF: true,
@@ -166,6 +163,7 @@ router.post('/', (req, res) => {
                     
                     var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`));
 
+                    // loop through all destinations and post mtarc
                     stream.on('close', () => {
                         console.log('uploading now');
                         for (var x in incomingRoutes.destinations) {
@@ -174,6 +172,7 @@ router.post('/', (req, res) => {
                         }
                     })
 
+                    // store new routes
                     saveRoutes(pageid, incomingRoutes, (err) => {
                         if (err) {
                             res.status(400).json({
@@ -188,11 +187,6 @@ router.post('/', (req, res) => {
                         }
                     })
                 })
-        
-                // loop through all destinations and post mtarc
-            
-                // store new routes
-                
             }
         })
     } else {
@@ -214,53 +208,108 @@ router.delete('/', (req, res) => {
                 res.status(400).send(err);
             } else {
                 // Get difference between submitted routes and stored routes
-
                 var updatedLocations = _.difference(routes.destinations, incomingRoutes.destinations);
+                var pageName = '/' + incomingRoutes.name;
+
+                console.log(incomingRoutes.destinations);
+
+                var deleteRoutes = incomingRoutes.destinations;
 
                 // publish original page
-                
-                // loop through all destinations and delete page
-            
-                // return reponse based on success
+                var url = new URL(incomingRoutes.sourceUrl);
+                var publishURL = `${url.origin}/@api/deki/drafts/${pageid}/publish`;
 
-                // update current routes
+                var options = {
+                    url: publishURL,
+                    auth: {
+                        user: 'mtimport',
+                        pass: '1234Mind'
+                    }
+                }
 
-                if (deleteOriginal) {
-                    // delete original page
+                request.post(options, (err, response) => {
+                    if (err) {
 
-                    // delete routes
+                    } else {
+                        // loop through all destinations and delete page
+                        for (var x in deleteRoutes) {
 
-                    fs.unlink(__dirname + `/files/${pageid}.txt`, (err) => {
-                        if (!err) {
-                            res.json({
-                                msg: 'All pages deleted'
+                            var destinationURL = new URL(deleteRoutes[x])
+                            deletePath = decodeURIComponent(destinationURL.pathname + pageName);
+                            deletePath = encodeURIComponent(encodeURIComponent(deletePath));
+                            var deleteURL = `${destinationURL.origin}/@api/deki/pages/=${deletePath}`;
+
+                            options = {
+                                url: deleteURL,
+                                auth: {
+                                    user: 'mtimport',
+                                    pass: '1234Mind'
+                                }
+                            }
+
+                            console.log(options);
+
+                            request.delete(options, (err, response) => {
+                                if (err || response.statusCode != 200) {
+                                    // log error
+                                    
+                                }
+                                console.log(err, response.body);
                             })
                         }
-                    });
-                } else {
-                    getRoutes(pageid, (routes, err) => {
-                        if (err) {
-                            res.status(400).json({
-                                message: err
-                            });
-                        } else {
-                            routes.destinations = updatedLocations;
-                            saveRoutes(pageid, routes, (err) => {
-                                if (err) {
-                                    res.status(400).json({
-                                        msg: err
-                                    })
-                                } else {
-                                    // return reponse based on success
-                                    res.json({
-                                        msg: 'completed',
-                                        destinations: routes
-                                    })
+
+                        if (deleteOriginal) {
+                            // delete original page
+                            options = {
+                                url: `${url.origin}/@api/deki/pages/${pageid}`,
+                                auth: {
+                                    user: 'mtimport',
+                                    pass: '1234Mind'
+                                }
+                            }
+
+                            request.delete(options, (err, response) => {
+                                if (err || response.statusCode != 200) {
+                                    // log error
                                 }
                             })
+        
+                            // delete routes
+                            fs.unlink(__dirname + `/files/${pageid}.txt`, (err) => {
+                                if (!err) {
+                                    res.json({
+                                        msg: 'All pages deleted'
+                                    })
+                                }
+                            });
+                        } else {
+                            // update current routes
+                            getRoutes(pageid, (routes, err) => {
+                                if (err) {
+                                    res.status(400).json({
+                                        message: err
+                                    });
+                                } else {
+                                    routes.destinations = updatedLocations;
+                                    saveRoutes(pageid, routes, (err) => {
+                                        if (err) {
+                                            res.status(400).json({
+                                                msg: err
+                                            })
+                                        } else {
+                                            // return reponse based on success
+                                            res.json({
+                                                msg: 'completed',
+                                                destinations: routes
+                                            })
+                                        }
+                                    })
+                                }
+                            });
                         }
-                    });
-                }
+
+                    }
+                });
             }
         });
     } else {
