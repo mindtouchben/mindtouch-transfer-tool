@@ -273,20 +273,20 @@ router.delete('/', (req, res) => {
                                 }
                             }
 
-                            // request.delete(options, (err, response) => {
-                            //     if (err || response.statusCode != 200) {
-                            //         // log error
-                            //     }
-                            // })
+                            request.delete(options, (err, response) => {
+                                if (err || response.statusCode != 200) {
+                                    // log error
+                                }
+                            })
         
                             // delete routes
-                            // fs.unlink(__dirname + `/files/${pageid}.txt`, (err) => {
-                            //     if (!err) {
-                            //         res.json({
-                            //             msg: 'All pages deleted'
-                            //         })
-                            //     }
-                            // });
+                            fs.unlink(__dirname + `/files/${pageid}.txt`, (err) => {
+                                if (!err) {
+                                    res.json({
+                                        msg: 'All pages deleted'
+                                    })
+                                }
+                            });
                         } else {
                             // update current routes
                             getRoutes(pageid, (routes, err) => {
