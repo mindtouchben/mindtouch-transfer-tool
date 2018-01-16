@@ -198,7 +198,7 @@ router.post('/', (req, res) => {
 
 router.delete('/', (req, res) => {
     var pageid = req.query.pageid != undefined ? req.query.pageid : null;
-    var deleteOriginal = req.query.deleteOriginal != undefined ? req.query.pageid : false;
+    var deleteOriginal = req.query.deleteOriginal != undefined ? req.query.deleteOriginal : false;
 
     var incomingRoutes = req.body.incomingRoutes;
 
