@@ -200,6 +200,8 @@ router.delete('/', (req, res) => {
     var pageid = req.query.pageid != undefined ? req.query.pageid : null;
     var deleteOriginal = req.query.deleteOriginal != undefined ? req.query.deleteOriginal : false;
 
+    console.log("delete Original: ", deleteOriginal);
+
     var incomingRoutes = req.body.incomingRoutes;
 
     if (pageid || incomingRoutes != undefined) {
@@ -258,8 +260,11 @@ router.delete('/', (req, res) => {
                             })
                         }
 
-                        if (deleteOriginal) {
+                        if (deleteOriginal === 'true') {
                             // delete original page
+
+                            console.log('Deleting Original');
+
                             options = {
                                 url: `${url.origin}/@api/deki/pages/${pageid}`,
                                 auth: {
@@ -268,20 +273,20 @@ router.delete('/', (req, res) => {
                                 }
                             }
 
-                            request.delete(options, (err, response) => {
-                                if (err || response.statusCode != 200) {
-                                    // log error
-                                }
-                            })
+                            // request.delete(options, (err, response) => {
+                            //     if (err || response.statusCode != 200) {
+                            //         // log error
+                            //     }
+                            // })
         
                             // delete routes
-                            fs.unlink(__dirname + `/files/${pageid}.txt`, (err) => {
-                                if (!err) {
-                                    res.json({
-                                        msg: 'All pages deleted'
-                                    })
-                                }
-                            });
+                            // fs.unlink(__dirname + `/files/${pageid}.txt`, (err) => {
+                            //     if (!err) {
+                            //         res.json({
+                            //             msg: 'All pages deleted'
+                            //         })
+                            //     }
+                            // });
                         } else {
                             // update current routes
                             getRoutes(pageid, (routes, err) => {
