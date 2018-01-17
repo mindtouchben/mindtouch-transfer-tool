@@ -2,12 +2,20 @@ const express = require('express');
 const request = require('request');
 const fs = require('fs');
 
+var AWS = require('aws-sdk');
 var URL = require('url-parse');
 var _ = require('lodash');
 var async = require('async');
 var FormData = require('form-data');
 
 var router = express.Router();
+
+AWS.config.loadFromPath(__dirname + '/../keys/config.json');
+
+var s3 = new AWS.S3({
+    apiVersion: '2006-03-01',
+    params: { Bucket: 'electrolux-publish-tool' }
+})
 
 var upload_file = (params, callback) => {
     // upload file
@@ -76,18 +84,27 @@ var queue = async.queue(upload_file, 5);
 var getRoutes = (pageid, callback) => {
     // query database by pageid to check if routes exist 
 
-    fs.readFile(__dirname + `/files/${pageid}.txt`, 'utf8', function(err, contents) {
+    s3.getObject({ Key: `${pageid}.txt` }, function(err, data) {
         if (err) {
             callback(null, err.message);
         } else {
-            callback(JSON.parse(contents));
+            callback(JSON.parse(data.Body.toString()));
         }
     });
 }
 
 var saveRoutes = (pageid, routes, callback) => {
-    fs.writeFile(__dirname + `/files/${pageid}.txt`, JSON.stringify(routes, null, 2), (err, fd) => {
-        callback(err);
+    var base64data = new Buffer(JSON.stringify(routes, null, 2));
+
+    s3.putObject({
+        Key: `${pageid}.txt`,
+        Body: base64data
+    }, function(err) {
+        if (err) {
+            callback(err);
+        } else {
+            callback();
+        }
     })
 }
 
