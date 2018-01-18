@@ -6,7 +6,6 @@ var AWS = require('aws-sdk');
 var URL = require('url-parse');
 var _ = require('lodash');
 var async = require('async');
-var FormData = require('form-data');
 
 var router = express.Router();
 
@@ -27,8 +26,8 @@ var upload_file = (params, callback) => {
     var options = {
         url: `${url.origin}/@api/deki/pages/=${importURL}?dream.out.format=json`,
         auth: {
-            user: 'mtimport',
-            pass: '1234Mind'
+            user: process.env.MT_USERNAME,
+            pass: process.env.MT_PASSWORD
         },
         json: true
     }
@@ -43,8 +42,8 @@ var upload_file = (params, callback) => {
                 postambleCRLF: true,
                 url: `${url.origin}/@api/deki/pages/${parentid}/import?dream.out.format=json&filename=${pageid}.mtarc&behavior=async`,
                 auth: {
-                    user: 'mtimport',
-                    pass: '1234Mind'
+                    user: process.env.MT_USERNAME,
+                    pass: process.env.MT_PASSWORD
                 },
                 json: true,
                 multipart: [
@@ -144,8 +143,8 @@ router.post('/', (req, res) => {
         var options = {
             url: publishURL,
             auth: {
-                user: 'mtimport',
-                pass: '1234Mind'
+                user: process.env.MT_USERNAME,
+                pass: process.env.MT_PASSWORD
             }
         }
 
@@ -160,8 +159,8 @@ router.post('/', (req, res) => {
                 options = {
                     url: `${url.origin}/@api/deki/pages/${pageid}?dream.out.format=json`,
                     auth: {
-                        user: 'mtimport',
-                        pass: '1234Mind'
+                        user: process.env.MT_USERNAME,
+                        pass: process.env.MT_PASSWORD
                     },
                     json: true
                 }
@@ -173,8 +172,8 @@ router.post('/', (req, res) => {
                     options = {
                         url: `${url.origin}/@api/deki/pages/${pageid}/export/${pageid}?relto=${parentid}`,
                         auth: {
-                            user: 'mtimport',
-                            pass: '1234Mind'
+                            user: process.env.MT_USERNAME,
+                            pass: process.env.MT_PASSWORD
                         }
                     }
                     
@@ -241,8 +240,8 @@ router.delete('/', (req, res) => {
                 var options = {
                     url: publishURL,
                     auth: {
-                        user: 'mtimport',
-                        pass: '1234Mind'
+                        user: process.env.MT_USERNAME,
+                        pass: process.env.MT_PASSWORD
                     }
                 }
 
@@ -261,8 +260,8 @@ router.delete('/', (req, res) => {
                             options = {
                                 url: deleteURL,
                                 auth: {
-                                    user: 'mtimport',
-                                    pass: '1234Mind'
+                                    user: process.env.MT_USERNAME,
+                                    pass: process.env.MT_PASSWORD
                                 }
                             }
 
@@ -285,8 +284,8 @@ router.delete('/', (req, res) => {
                             options = {
                                 url: `${url.origin}/@api/deki/pages/${pageid}`,
                                 auth: {
-                                    user: 'mtimport',
-                                    pass: '1234Mind'
+                                    user: process.env.MT_USERNAME,
+                                    pass: process.env.MT_PASSWORD
                                 }
                             }
 
