@@ -13,6 +13,8 @@ var router = express.Router();
 AWS.config.loadFromPath(__dirname + '/../keys/config.json');
 
 var s3 = new AWS.S3({
+    accessKeyId: process.env.S3_KEY,
+    secretAccessKey: process.env.S3_SECRET,
     apiVersion: '2006-03-01',
     params: { Bucket: 'electrolux-publish-tool' }
 })
