@@ -296,12 +296,19 @@ router.delete('/', (req, res) => {
                             })
         
                             // delete routes
-                            fs.unlink(__dirname + `/files/${pageid}.txt`, (err) => {
-                                if (!err) {
-                                    res.json({
-                                        msg: 'All pages deleted'
-                                    })
-                                }
+                            var params = {
+                                Delete: { // required
+                                    Objects: [ // required
+                                    {
+                                      Key: `${pageid}` // required
+                                    }
+                                    ],
+                                },
+                            };
+
+                            s3.deleteObjects(params, function(err, data) {
+                                if (err) console.log(err, err.stack); // an error occurred
+                                else     console.log(data);           // successful response
                             });
                         } else {
                             // update current routes
