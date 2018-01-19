@@ -1,7 +1,0 @@
-{
-  "sourceUrl": "https://benr-demo.mindtouch.us/",
-  "destinations": [
-    "https://benr-demo.mindtouch.us/howdy_doody",
-    "https://synonym-search.mindtouch.us/A/B"
-  ]
-}
