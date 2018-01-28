@@ -133,6 +133,8 @@ router.post('/', cors(), (req, res) => {
 
     var incomingRoutes = req.body.incomingRoutes;
 
+    console.log('1');
+
     // check if incoming routes have all elements if not return 400
 
     if (pageid && incomingRoutes != undefined) {
@@ -151,6 +153,8 @@ router.post('/', cors(), (req, res) => {
 
         request.post(options, (err, response) => {
             // if (err || response.statusCode == 404) {
+
+            console.log('2', response.body);
             if (err) {
                 res.status(400).json({
                     message: "Something went wrong please try again"
@@ -168,6 +172,7 @@ router.post('/', cors(), (req, res) => {
 
 
                 request.get(options, (err, response) => {
+                    console.log('3', response.body);
                     
                     var parentid = response.body['page.parent']['@id'];
                     options = {
@@ -181,13 +186,13 @@ router.post('/', cors(), (req, res) => {
                     var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`));
 
                     // loop through all destinations and post mtarc
-                    stream.on('close', () => {
-                        console.log('uploading now');
-                        for (var x in incomingRoutes.destinations) {
-                            var destination = incomingRoutes.destinations[x];
-                            queue.push({pageid, destination});
-                        }
-                    })
+                    // stream.on('close', () => {
+                    //     console.log('uploading now');
+                    //     for (var x in incomingRoutes.destinations) {
+                    //         var destination = incomingRoutes.destinations[x];
+                    //         queue.push({pageid, destination});
+                    //     }
+                    // })
 
                     // store new routes
                     saveRoutes(pageid, incomingRoutes, (err) => {
