@@ -186,13 +186,14 @@ router.post('/', cors(), (req, res) => {
                     var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`));
 
                     // loop through all destinations and post mtarc
-                    // stream.on('close', () => {
-                    //     console.log('uploading now');
-                    //     for (var x in incomingRoutes.destinations) {
-                    //         var destination = incomingRoutes.destinations[x];
-                    //         queue.push({pageid, destination});
-                    //     }
-                    // })
+                    stream.on('close', () => {
+                        console.log('uploading now');
+                        
+                        // for (var x in incomingRoutes.destinations) {
+                        //     var destination = incomingRoutes.destinations[x];
+                        //     queue.push({pageid, destination});
+                        // }
+                    })
 
                     // store new routes
                     saveRoutes(pageid, incomingRoutes, (err) => {
