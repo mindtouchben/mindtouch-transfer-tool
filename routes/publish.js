@@ -6,6 +6,7 @@ var AWS = require('aws-sdk');
 var URL = require('url-parse');
 var _ = require('lodash');
 var async = require('async');
+var cors = require('cors');
 
 var router = express.Router();
 
@@ -107,7 +108,7 @@ var saveRoutes = (pageid, routes, callback) => {
     })
 }
 
-router.get('/', (req, res) => {
+router.get('/', cors(),  (req, res) => {
     var pageid = req.query.pageid != undefined ? req.query.pageid : null;
 
     if (pageid) {
@@ -127,7 +128,7 @@ router.get('/', (req, res) => {
     }
 });
 
-router.post('/', (req, res) => {
+router.post('/', cors(), (req, res) => {
     var pageid = req.query.pageid != undefined ? req.query.pageid : null;
 
     var incomingRoutes = req.body.incomingRoutes;
@@ -212,7 +213,7 @@ router.post('/', (req, res) => {
     }
 });
 
-router.delete('/', (req, res) => {
+router.delete('/', cors(),  (req, res) => {
     var pageid = req.query.pageid != undefined ? req.query.pageid : null;
     var deleteOriginal = req.query.deleteOriginal != undefined ? req.query.deleteOriginal : false;
 
