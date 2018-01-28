@@ -188,11 +188,11 @@ router.post('/', cors(), (req, res) => {
                     // loop through all destinations and post mtarc
                     stream.on('close', () => {
                         console.log('uploading now');
-                        
-                        // for (var x in incomingRoutes.destinations) {
-                        //     var destination = incomingRoutes.destinations[x];
-                        //     queue.push({pageid, destination});
-                        // }
+
+                        for (var x in incomingRoutes.destinations) {
+                            var destination = incomingRoutes.destinations[x];
+                            queue.push({pageid, destination});
+                        }
                     })
 
                     // store new routes
