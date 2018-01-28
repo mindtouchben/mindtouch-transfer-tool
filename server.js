@@ -1,7 +1,7 @@
 const express = require('express');
 const request = require('request');
 
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
 
 const port = process.env.PORT || 3000; 
 
@@ -15,6 +15,7 @@ app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', 'https://benr-demo.mindtouch.us');
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.how-to-and-help.com');
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
