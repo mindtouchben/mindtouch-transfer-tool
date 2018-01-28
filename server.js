@@ -14,7 +14,6 @@ app.use('/files', express.static('routes/tmp'));
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'https://benr-demo.mindtouch.us');
     res.setHeader('Access-Control-Allow-Origin', 'https://www.how-to-and-help.com');
 
     // Request methods you wish to allow
