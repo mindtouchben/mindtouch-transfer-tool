@@ -14,7 +14,7 @@ var s3 = new AWS.S3({
     accessKeyId: process.env.S3_KEY,
     secretAccessKey: process.env.S3_SECRET,
     apiVersion: '2006-03-01',
-    params: { Bucket: 'electrolux-publish-tool' }
+    params: { Bucket: 'select-account-publish-tool' }
 })
 
 var upload_file = (params, callback) => {
@@ -132,9 +132,6 @@ router.post('/', cors(), (req, res) => {
     var pageid = req.query.pageid != undefined ? req.query.pageid : null;
 
     var incomingRoutes = req.body.incomingRoutes;
-
-    console.log('1');
-
     // check if incoming routes have all elements if not return 400
 
     if (pageid && incomingRoutes != undefined) {
@@ -153,8 +150,6 @@ router.post('/', cors(), (req, res) => {
 
         request.post(options, (err, response) => {
             // if (err || response.statusCode == 404) {
-
-            console.log('2', response.body);
             if (err) {
                 res.status(400).json({
                     message: "Something went wrong please try again"
@@ -172,7 +167,6 @@ router.post('/', cors(), (req, res) => {
 
 
                 request.get(options, (err, response) => {
-                    console.log('3', response.body);
                     
                     var parentid = response.body['page.parent']['@id'];
                     options = {
