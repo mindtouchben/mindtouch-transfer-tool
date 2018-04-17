@@ -1,6 +1,11 @@
 const express = require('express');
 const request = require('request');
 const fs = require('fs');
+const requestsync = require('sync-request');
+const unzip = require('unzipper');
+const path = require('path');
+var zipFolder = require('zip-folder');
+var archiver = require('archiver');
 
 var AWS = require('aws-sdk');
 var URL = require('url-parse');
@@ -14,7 +19,7 @@ var s3 = new AWS.S3({
     accessKeyId: process.env.S3_KEY,
     secretAccessKey: process.env.S3_SECRET,
     apiVersion: '2006-03-01',
-    params: { Bucket: 'select-account-publish-tool' }
+    params: { Bucket: 'electrolux-publish-tool' }
 })
 
 var upload_file = (params, callback) => {
@@ -50,7 +55,7 @@ var upload_file = (params, callback) => {
                 multipart: [
                     {
                         'content-type': 'application/json',
-                        body: fs.readFileSync(__dirname + `/tmp/${pageid}.mtarc`)
+                        body: fs.readFileSync(`/tmp/${pageid}.mtarc`)
                     }
                 ]
             }
@@ -177,17 +182,97 @@ router.post('/', cors(), (req, res) => {
                         }
                     }
                     
-                    var stream = request.get(options).pipe(fs.createWriteStream(__dirname + `/tmp/${pageid}.mtarc`));
+                    var stream = request.get(options).pipe(unzip.Extract({path: `/tmp/${pageid}`})).on('close', () => {
+                        setTimeout(() => {
+                            fs.readdir(`/tmp/${pageid}/relative`, (err, files) => {
+                                if( err ) {
+                                    console.error( "Could not list the directory.", err );
+                                    process.exit(1);
+                                } 
+                                updatefile = '';
+                                updatedata = '';
+                                files.forEach((file, index) => {
+                                    if (file != '.DS_Store') {
+                                        var data = fs.readFileSync(`/tmp/${pageid}/relative/${file}/page.xml`, 'utf8');
+                                        if (typeof(data) == "string") {
+                                            var pattern = /<img\s*alt=".*"\s*class=".*"\s*src.path=".*"\s*src.filename=".*"\s*\/>/g;
+                                            var result = String(data).match(pattern);
+                                            if (result) {
+                                                result.forEach((path) => {
+                                                    var imagePath = /(?:src.path=")(.*)(?:"\ssrc)/g.exec(path)[1];
+                                                    var filename = /(?:src.filename=")(.*)(?:"\s\/>)/g.exec(path)[1];
+                                                    var mediaURL = `${url.origin}/@api/deki/pages/=${encodeURIComponent(encodeURIComponent(imagePath))}/files/?dream.out.format=json`
+                                                    options.url = mediaURL
+                                                    var updatedSrc = ""
+                                                    const res = requestsync('GET', mediaURL, {
+                                                        headers: {authorization: 'Basic ' + Buffer(`${process.env.MT_USERNAME}:${process.env.MT_PASSWORD}`).toString('base64')}
+                                                    });
+                                                    console.log(mediaURL);
+                                                    const body = JSON.parse(res.getBody('utf8'));
+                                                    if ("@href" in body.file && body.file.filename == filename) {
+                                                        updatedSrc = body.file['@href'];
+                                                    } else {
+                                                        body.file.forEach((file) => {
+                                                            if (file.filename == filename) {
+                                                                updatedSrc = file.contents['@href'];
+                                                            }
+                                                        })
+                                                    }
+                                                    var newPath = path.replace(/(?:src.*=")(.*)(?:"\s\/>)/g, `src="${updatedSrc}" />`);
+                                                    data = data.replace(path, newPath);
+                                                });
+                                                fs.writeFileSync(`/tmp/${pageid}/relative/${file}/page.xml`, data, 'utf8');
+                                            }
+                    
+                                            var pattern = /<a.*href\.path=".*"\shref\.filename=".*">/g;
+                                            var result = String(data).match(pattern);
+                                            if (result) {
+                                                result.forEach((path) => {
+                                                    var imagePath = /(?:href.path=")(.*)(?:"\shref)/g.exec(path)[1];
+                                                    var filename = /(?:href.filename=")(.*)(?:">)/g.exec(path)[1];
+                    
+                                                    if (imagePath && filename) {
+                                                        var mediaURL = `${url.origin}/@api/deki/pages/=${encodeURIComponent(encodeURIComponent(imagePath))}/files/?dream.out.format=json`
+                                                        console.log(mediaURL);
+                                                        options.url = mediaURL
+                                                        var updatedSrc = ""
+                                                        const res = requestsync('GET', mediaURL, {
+                                                            headers: {authorization: 'Basic ' + Buffer(`${process.env.MT_USERNAME}:${process.env.MT_PASSWORD}`).toString('base64')}
+                                                        });
+                                                        const body = JSON.parse(res.getBody('utf8'));
+                                                        if ("@href" in body.file && body.file.filename == filename) {
+                                                            updatedSrc = body.file['@href'];
+                                                        } else {
+                                                            body.file.forEach((file) => {
+                                                                if (file.filename == filename) {
+                                                                    updatedSrc = file.contents['@href'];
+                                                                }
+                                                            })
+                                                        }
+                                                        var newPath = path.replace(/(?:href.*=")(.*)(?:")/g, `href="${updatedSrc}"`);
+                                                        console.log(path, newPath);
+                                                        data = data.replace(path, newPath);
+                                                    }
+                                                });
+                                                fs.writeFileSync(`/tmp/${pageid}/relative/${file}/page.xml`, data, 'utf8');
+                                            }
+                                            fs.writeFileSync(`/tmp/${pageid}/relative/${file}/page.xml`, data, 'utf8');
+                                            var output = fs.createWriteStream(`/tmp/${pageid}.mtarc`);
+                                            var archive = archiver('zip');
+                                            archive.pipe(output);
+                                            archive.directory(`/tmp/${pageid}`, false);
+                                            archive.finalize();
 
-                    // loop through all destinations and post mtarc
-                    stream.on('close', () => {
-                        console.log('uploading now');
-
-                        for (var x in incomingRoutes.destinations) {
-                            var destination = incomingRoutes.destinations[x];
-                            queue.push({pageid, destination});
-                        }
-                    })
+                                            for (var x in incomingRoutes.destinations) {
+                                                var destination = incomingRoutes.destinations[x];
+                                                queue.push({pageid, destination});
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                        }, 3000);
+                    });
 
                     // store new routes
                     saveRoutes(pageid, incomingRoutes, (err) => {
