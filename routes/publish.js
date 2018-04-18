@@ -224,7 +224,7 @@ router.post('/', cors(), (req, res) => {
                                                 fs.writeFileSync(`/tmp/${pageid}/relative/${file}/page.xml`, data, 'utf8');
                                             }
                     
-                                            var pattern = /<a.*href\.path=".*"\shref\.filename=".*">/g;
+                                            var pattern = /<a((?!href\.anchor).)*href\.filename=".*">/g;
                                             var result = String(data).match(pattern);
                                             if (result) {
                                                 result.forEach((path) => {
