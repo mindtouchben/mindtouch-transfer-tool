@@ -61,16 +61,16 @@ var upload_file = (params, callback) => {
             }
 
             request.put(options, (err, res, body) => {
-                if (response.statusCode != 200) {
+                if (res.statusCode != 200) {
                     console.log('Failed upload to' + url.origin);
-                    console.log(body);
+                    console.log(res);
                     console.log(options);
                     setTimeout(() => {
                         upload_file(params, callback);
                     }, 10000)
                 } else {
                     console.log('Complete');
-                    console.log(body);
+                    console.log(res);
                     console.log(params.destination);
                     callback();
                 }
