@@ -206,7 +206,7 @@ router.post('/', cors(), (req, res) => {
                                                         mediaURL = `${url.origin}/@api/deki/pages/=${pageid}/files/?dream.out.format=json`
 
                                                     } else {
-                                                        mediaURL = `${url.origin}/@api/deki/pages/=${encodeURIComponent(encodeURIComponent(imagePath))}/files/?dream.out.format=json`
+                                                        mediaURL = `${url.origin}/@api/deki/pages/${encodeURIComponent(encodeURIComponent(imagePath))}/files/?dream.out.format=json`
                                                     }
                                                     options.url = mediaURL
                                                     var updatedSrc = ""
