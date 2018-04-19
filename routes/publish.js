@@ -216,7 +216,7 @@ router.post('/', cors(), (req, res) => {
                                                     console.log(mediaURL);
                                                     const body = JSON.parse(res.getBody('utf8'));
                                                     if ("@href" in body.file && body.file.filename == filename) {
-                                                        updatedSrc = body.file['@href'];
+                                                        updatedSrc = body.file.contents['@href'];
                                                     } else {
                                                         body.file.forEach((file) => {
                                                             if (file.filename == filename) {
