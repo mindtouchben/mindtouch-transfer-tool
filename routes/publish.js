@@ -201,7 +201,13 @@ router.post('/', cors(), (req, res) => {
                                                 result.forEach((path) => {
                                                     var imagePath = /(?:src.path=")(.*)(?:"\ssrc)/g.exec(path)[1];
                                                     var filename = /(?:src.filename=")(.*)(?:"\s\/>)/g.exec(path)[1];
-                                                    var mediaURL = `${url.origin}/@api/deki/pages/=${encodeURIComponent(encodeURIComponent(imagePath))}/files/?dream.out.format=json`
+                                                    var mediaURL;
+                                                    if (imagePath.startsWith('//')) {
+                                                        mediaURL = `${url.origin}/@api/deki/pages/=${pageid}/files/?dream.out.format=json`
+
+                                                    } else {
+                                                        mediaURL = `${url.origin}/@api/deki/pages/=${encodeURIComponent(encodeURIComponent(imagePath))}/files/?dream.out.format=json`
+                                                    }
                                                     options.url = mediaURL
                                                     var updatedSrc = ""
                                                     const res = requestsync('GET', mediaURL, {
