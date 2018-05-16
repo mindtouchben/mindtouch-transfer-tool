@@ -40,8 +40,8 @@ var upload_file = (params, callback) => {
 
     request.get(options, (error, response) => {
         if (!error && response.body['@id'] != undefined) {
-            var parentid = response.body['@id'];       
-            
+            var parentid = response.body['@id'];
+
             options = {
                 method: 'PUT',
                 preambleCRLF: true,
@@ -87,7 +87,7 @@ var upload_file = (params, callback) => {
 var queue = async.queue(upload_file, 5);
 
 var getRoutes = (pageid, callback) => {
-    // query database by pageid to check if routes exist 
+    // query database by pageid to check if routes exist
 
     s3.getObject({ Key: `${pageid}.txt` }, function(err, data) {
         if (err) {
@@ -172,7 +172,7 @@ router.post('/', cors(), (req, res) => {
 
 
                 request.get(options, (err, response) => {
-                    
+
                     var parentid = response.body['page.parent']['@id'];
                     options = {
                         url: `${url.origin}/@api/deki/pages/${pageid}/export/${pageid}?relto=${parentid}`,
@@ -181,14 +181,14 @@ router.post('/', cors(), (req, res) => {
                             pass: process.env.MT_PASSWORD
                         }
                     }
-                    
+
                     var stream = request.get(options).pipe(unzip.Extract({path: `/tmp/${pageid}`})).on('close', () => {
                         setTimeout(() => {
                             fs.readdir(`/tmp/${pageid}/relative`, (err, files) => {
                                 if( err ) {
                                     console.error( "Could not list the directory.", err );
                                     process.exit(1);
-                                } 
+                                }
                                 updatefile = '';
                                 updatedata = '';
                                 files.forEach((file, index) => {
@@ -229,14 +229,14 @@ router.post('/', cors(), (req, res) => {
                                                 });
                                                 fs.writeFileSync(`/tmp/${pageid}/relative/${file}/page.xml`, data, 'utf8');
                                             }
-                    
-                                            var pattern = /<a((?!href\.anchor).)*href\.filename=".*">/g;
+
+                                            var pattern = /<a((?!href\.anchor).)*?href\.filename=".*?">/g;
                                             var result = String(data).match(pattern);
                                             if (result) {
                                                 result.forEach((path) => {
                                                     var imagePath = /(?:href.path=")(.*)(?:"\shref)/g.exec(path)[1];
                                                     var filename = /(?:href.filename=")(.*)(?:">)/g.exec(path)[1];
-                    
+
                                                     if (imagePath && filename) {
                                                         var mediaURL = `${url.origin}/@api/deki/pages/=${encodeURIComponent(encodeURIComponent(imagePath))}/files/?dream.out.format=json`
                                                         console.log(mediaURL);
@@ -362,7 +362,7 @@ router.delete('/', cors(),  (req, res) => {
                             request.delete(options, (err, response) => {
                                 if (err || response.statusCode != 200) {
                                     // log error
-                                    
+
                                 }
                                 console.log(err, response.body);
                             })
@@ -386,7 +386,7 @@ router.delete('/', cors(),  (req, res) => {
                                     // log error
                                 }
                             })
-        
+
                             // delete routes
                             var params = {
                                 Delete: { // required
