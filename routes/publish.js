@@ -42,7 +42,7 @@ var upload_file = (params, callback) => {
         if (!error && response.body['@id'] != undefined) {
             var parentid = response.body['@id'];
 
-            console.log(response.body['@id']);
+            console.log(response.body);
 
             options = {
                 method: 'PUT',
