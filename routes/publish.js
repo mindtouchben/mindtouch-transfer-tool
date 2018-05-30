@@ -41,10 +41,7 @@ var upload_file = (params, callback) => {
     request.get(options, (error, response) => {
         if (!error && response.body['@id'] != undefined) {
             var parentid = response.body['@id'];
-            var finalDestinationURL = response.body['uri.ui'];
-
-            console.log(finalDestinationURL);
-
+            var finalDestinationURL = params.finalDestinationURL;
             options = {
                 method: 'PUT',
                 preambleCRLF: true,
@@ -85,6 +82,7 @@ var upload_file = (params, callback) => {
                     }
 
                     request.get(options, (_a, _b, _c) => {
+                        console.log(_a, _b, _c);
                         callback();
                     })
                 }
@@ -188,6 +186,7 @@ router.post('/', cors(), (req, res) => {
                 request.get(options, (err, response) => {
 
                     var parentid = response.body['page.parent']['@id'];
+                    var finalDestinationURL = response.body['uri.ui'];
                     options = {
                         url: `${url.origin}/@api/deki/pages/${pageid}/export/${pageid}?relto=${parentid}`,
                         auth: {
@@ -285,7 +284,7 @@ router.post('/', cors(), (req, res) => {
 
                                             for (var x in incomingRoutes.destinations) {
                                                 var destination = incomingRoutes.destinations[x];
-                                                queue.push({pageid, destination});
+                                                queue.push({pageid, destination, finalDestinationURL});
                                             }
                                         }
                                     }
