@@ -84,7 +84,7 @@ var upload_file = (params, callback) => {
                         json: true
                     }
 
-                    request.get(options, (_, _, _) => {
+                    request.get(options, (_a, _b, _c) => {
                         callback();
                     })
                 }
