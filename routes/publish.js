@@ -41,8 +41,9 @@ var upload_file = (params, callback) => {
     request.get(options, (error, response) => {
         if (!error && response.body['@id'] != undefined) {
             var parentid = response.body['@id'];
+            var finalDestinationURL = response.body['uri.ui'];
 
-            console.log(response.body);
+            console.log(finalDestinationURL);
 
             options = {
                 method: 'PUT',
@@ -73,7 +74,19 @@ var upload_file = (params, callback) => {
                 } else {
                     console.log('Complete');
                     console.log(params.destination);
-                    callback();
+                    options = {
+                        method: 'GET',
+                        url: `${$finalDestinationURL}?nocache=true`,
+                        auth: {
+                            user: process.env.MT_USERNAME,
+                            pass: process.env.MT_PASSWORD
+                        },
+                        json: true
+                    }
+
+                    request.get(options, (_, _, _) => {
+                        callback();
+                    })
                 }
             })
 
