@@ -22,6 +22,22 @@ var s3 = new AWS.S3({
     params: { Bucket: 'electrolux-publish-tool' }
 })
 
+var res = requestSync('POST', `https://${url}/@api/deki/site/developer-tokens/internal?dream.out.format=json`);
+var body = res.getBody('utf8');
+
+const json = JSON.parse(body);
+const key = json.key;
+const secret = json.secret;
+
+const hmac = crypto.createHmac('sha256', secret);
+
+const epoch = Math.floor(Date.now() / 1000);
+const user = '=admin';
+
+hmac.update(`${key}${epoch}${user}`);
+const hash = hmac.digest('hex');
+token = `int_${key}_${epoch}_${user}_${hash}`;v
+
 var upload_file = (params, callback) => {
     // upload file
     var pageid = params.pageid;
@@ -71,12 +87,28 @@ var upload_file = (params, callback) => {
                 } else {
                     console.log('Complete');
                     console.log(params.destination);
+
+                    var res = requestSync('POST', `https://${url.origin}/@api/deki/site/developer-tokens/internal?dream.out.format=json`);
+                    var body = res.getBody('utf8');
+
+                    const json = JSON.parse(body);
+                    const key = json.key;
+                    const secret = json.secret;
+
+                    const hmac = crypto.createHmac('sha256', secret);
+
+                    const epoch = Math.floor(Date.now() / 1000);
+                    const user = '=admin';
+
+                    hmac.update(`${key}${epoch}${user}`);
+                    const hash = hmac.digest('hex');
+                    token = `int_${key}_${epoch}_${user}_${hash}`;
+
                     options = {
                         method: 'GET',
                         url: `${finalDestinationURL}?nocache=true`,
-                        auth: {
-                            user: process.env.MT_USERNAME,
-                            pass: process.env.MT_PASSWORD
+                        headers: {
+                            'X-Deki-Token': token
                         },
                         json: true
                     }
