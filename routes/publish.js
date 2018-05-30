@@ -76,7 +76,7 @@ var upload_file = (params, callback) => {
                     console.log(params.destination);
                     options = {
                         method: 'GET',
-                        url: `${$finalDestinationURL}?nocache=true`,
+                        url: `${finalDestinationURL}?nocache=true`,
                         auth: {
                             user: process.env.MT_USERNAME,
                             pass: process.env.MT_PASSWORD
