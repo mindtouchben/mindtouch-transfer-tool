@@ -42,6 +42,8 @@ var upload_file = (params, callback) => {
         if (!error && response.body['@id'] != undefined) {
             var parentid = response.body['@id'];
 
+            console.log(response.body['@id']);
+
             options = {
                 method: 'PUT',
                 preambleCRLF: true,
@@ -70,7 +72,6 @@ var upload_file = (params, callback) => {
                     }, 10000)
                 } else {
                     console.log('Complete');
-                    console.log(res);
                     console.log(params.destination);
                     callback();
                 }
