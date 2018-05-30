@@ -88,7 +88,7 @@ var upload_file = (params, callback) => {
                     console.log('Complete');
                     console.log(params.destination);
 
-                    var res = requestSync('POST', `https://${url.origin}/@api/deki/site/developer-tokens/internal?dream.out.format=json`);
+                    var res = requestsync('POST', `https://${url.origin}/@api/deki/site/developer-tokens/internal?dream.out.format=json`);
                     var body = res.getBody('utf8');
 
                     const json = JSON.parse(body);
